@@ -1,5 +1,5 @@
 upstream docker-backend-api {
-  server ${FASTAPI} max_fails=0;
+  server fastapi:8000 max_fails=0;
 }
 
 server {
