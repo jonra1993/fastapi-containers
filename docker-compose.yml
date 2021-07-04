@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:     
+  
+  fastapi:
+    container_name: "fastapi"        
+    image: "jrtec/fastapi-chat-backend"
+    build: ./backend
+    command: "uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000"
+    volumes:
+      - ./backend:/code
+      - ./backend/static:/code/static    
+    env_file: .env
+    expose:
+      - "8000"
+    ports:
+      - 8000:8000
+      
+
+  nginx:
+    container_name: nginx
+    restart: always
+    image: "nginx:1.19.10"  
+    ports:
+      - "80:8080"
+    volumes:
+      - ./backend/static:/code/static
+      - ./nginx-config-files/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-config-files/app.nginx.template:/etc/nginx/templates/app.nginx.template        
+    environment:
+      FASTAPI: fastapi
+    depends_on:
+      - fastapi
