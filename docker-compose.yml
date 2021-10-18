@@ -3,7 +3,7 @@ version: "3.9"
 services:     
   
   fastapi:
-    # container_name: "fastapi"        
+    container_name: "fastapi-container"        
     image: "jrtec/fastapi-chat-backend"
     command: "uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000"
     volumes:
@@ -12,18 +12,63 @@ services:
     expose:
       - "8000"
     ports:
-      - 8000:8000
-      
+      - "8180:8000"      
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi_local.entrypoints=web"
+      - "traefik.http.routers.fastapi_local.rule=Host(`${LOCAL_1}`, `${LOCAL_2}`)"
+    networks:
+      - traefik-fastapi-network   
 
-  nginx:
-    # container_name: nginx
+  # datadog:
+  #   image: datadog/agent
+  #   container_name: "datadog-agent-fastapi-container"
+  #   expose:  # new
+  #     - 8125
+  #     - 8126    
+  #   volumes:
+  #    - /var/run/docker.sock:/var/run/docker.sock
+  #    - /proc/:/host/proc/:ro
+  #    - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+  #    - /var/lib/docker/containers:/var/lib/docker/containers:ro    
+  #   depends_on:
+  #     - fastapi
+  #   environment:
+  #     - DD_API_KEY=${DD_API_KEY}
+  #     - DD_SITE=datadoghq.com
+  #     - DD_LOGS_ENABLED=true
+  #     - DD_LOGS_CONFIG_DOCKER_CONTAINER_USE_FILE=true # To read log from file instead of the docker socket
+  #   networks:
+  #     - traefik-fastapi-network
+
+  traefik:
+    image: "traefik:latest"
+    container_name: "traefik-fastapi-container"
     restart: always
-    image: "nginx:1.19.10"  
+    command:
+      - "--providers.docker=true"
     ports:
-      - "80:8080"
-    volumes:
-      - ./backend/static:/code/static
-      - ./nginx-config-files/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx-config-files/app.nginx.template:/etc/nginx/templates/app.nginx.template
-    depends_on:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"    
+    depends_on:      
       - fastapi
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/.htpasswd:/.htpasswd
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.LOCAL_1`, `traefik.${LOCAL_2}`)"
+      # - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
+
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
+    networks:
+      - traefik-fastapi-network
+
+networks:
+  # Use the previously created public network "traefik-public", shared with other
+  # services that need to be publicly available via this Traefik
+  traefik-fastapi-network:
