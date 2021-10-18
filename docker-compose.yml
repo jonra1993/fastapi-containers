@@ -16,30 +16,28 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fastapi_local.entrypoints=web"
-      - "traefik.http.routers.fastapi_local.rule=Host(`${LOCAL_1}`, `${LOCAL_2}`)"
-    networks:
-      - traefik-fastapi-network   
+      - "traefik.http.routers.fastapi_local.rule=Host(`${LOCAL_1}`, `${LOCAL_2}`, `traefik.${EXT_ENDPOINT1}`, `traefik.${EXT_ENDPOINT2}`, `${EXT_ENDPOINT3}`)"
+      - traefik.http.services.fastapi_localservice.loadbalancer.server.port=8000
 
-  # datadog:
-  #   image: datadog/agent
-  #   container_name: "datadog-agent-fastapi-container"
-  #   expose:  # new
-  #     - 8125
-  #     - 8126    
-  #   volumes:
-  #    - /var/run/docker.sock:/var/run/docker.sock
-  #    - /proc/:/host/proc/:ro
-  #    - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
-  #    - /var/lib/docker/containers:/var/lib/docker/containers:ro    
-  #   depends_on:
-  #     - fastapi
-  #   environment:
-  #     - DD_API_KEY=${DD_API_KEY}
-  #     - DD_SITE=datadoghq.com
-  #     - DD_LOGS_ENABLED=true
-  #     - DD_LOGS_CONFIG_DOCKER_CONTAINER_USE_FILE=true # To read log from file instead of the docker socket
-  #   networks:
-  #     - traefik-fastapi-network
+
+  datadog:
+    image: datadog/agent
+    container_name: "datadog-agent-fastapi-container"
+    expose:  # new
+      - 8125
+      - 8126    
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc/:/host/proc/:ro
+     - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+     - /var/lib/docker/containers:/var/lib/docker/containers:ro    
+    depends_on:
+      - fastapi
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=datadoghq.com
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_DOCKER_CONTAINER_USE_FILE=true # To read log from file instead of the docker socket    
 
   traefik:
     image: "traefik:latest"
@@ -50,7 +48,9 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"    
+      - "8080:8080"
+      - "8000:8000"
+      - "3306:3306"
     depends_on:      
       - fastapi
     volumes:
@@ -59,16 +59,7 @@ services:
       - ./traefik/.htpasswd:/.htpasswd
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.LOCAL_1`, `traefik.${LOCAL_2}`)"
-      # - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
-
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${LOCAL_1}`, `traefik.${LOCAL_2}`,`traefik.${EXT_ENDPOINT1}`, `traefik.${EXT_ENDPOINT2}`, `${EXT_ENDPOINT3}`)"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=auth"
       - "traefik.http.middlewares.auth.basicauth.usersfile=/.htpasswd"
-    networks:
-      - traefik-fastapi-network
-
-networks:
-  # Use the previously created public network "traefik-public", shared with other
-  # services that need to be publicly available via this Traefik
-  traefik-fastapi-network:
