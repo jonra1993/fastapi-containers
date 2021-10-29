@@ -78,13 +78,19 @@ Docker should increse the RAM from 2Gb to 4Gb to aviod hang container when runni
 Run the follow command depending of you OS. In a terminal you should change the SONAR_LOGIN variable
 
 #### Windows Command line
+```sh
 docker run --network=fastapi-containers_default --rm -e SONAR_HOST_URL="http://sonarqube-container-fast:9000" -e SONAR_LOGIN="c0c2bdecce6a849ffa7f80f839f9a112a9bfaa3d" -v "%cd%:/usr/src" sonarsource/sonar-scanner-cli
+```
 
 #### Windows Power Shell
+```sh
 docker run --network=fastapi-containers_default --rm -e SONAR_HOST_URL="http://sonarqube-container-fast:9000" -e SONAR_LOGIN="c0c2bdecce6a849ffa7f80f839f9a112a9bfaa3d" -v "${PWD}:/usr/src" sonarsource/sonar-scanner-cli
+```
 
 #### Mac and Linux
+```sh
 docker run --network=fastapi-containers_default --rm -e SONAR_HOST_URL="http://sonarqube-container-fast:9000" -e SONAR_LOGIN="c0c2bdecce6a849ffa7f80f839f9a112a9bfaa3d" -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli
+```
 
 When you return to SonarQube panel you will have the result of scanning
 ![SonarQube - Scanner](static/sonar5.png)
