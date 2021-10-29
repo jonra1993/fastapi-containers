@@ -30,6 +30,17 @@ docker-compose down
 ```
 
 
+# Docker should increse the RAM from 2 to 4
+
+# Windows Command line
+docker run --network=fastapi-containers_default --rm -e SONAR_HOST_URL="http://sonarqube-container-fast:9000" -e SONAR_LOGIN="71d9eb1ba1eaa52691ed530a90a8a33a7e32f15d" -v "%cd%:/usr/src" sonarsource/sonar-scanner-cli
+
+# Windows Command line
+docker run --network=fastapi-containers_default --rm -e SONAR_HOST_URL="http://sonarqube-container-fast:9000" -e SONAR_LOGIN="71d9eb1ba1eaa52691ed530a90a8a33a7e32f15d" -v "${PWD}:/usr/src" sonarsource/sonar-scanner-cli
+
+# Mac and Linux
+docker run --network=fastapi-containers_default --rm -e SONAR_HOST_URL="http://sonarqube-container-fast:9000" -e SONAR_LOGIN="71d9eb1ba1eaa52691ed530a90a8a33a7e32f15d" -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli
+
 ## License
 
 [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)

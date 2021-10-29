@@ -133,3 +133,8 @@ dmypy.json
 /.env.development.local
 /.env.test.local
 /.env.production.local
+
+.scannerwork
+sonarqube/extensions
+sonarqube/data
+sonarqube/logs
