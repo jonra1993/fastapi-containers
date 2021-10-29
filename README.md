@@ -98,7 +98,7 @@ When you return to SonarQube panel you will have the result of scanning
 
 ### Export report
 Go to More/CNES Report and choose you project, this is going to download a text report 
-![SonarQube - Report](static/sonar5.png)
+![SonarQube - Report](static/report.png)
 
 ## License
 
