@@ -1,3 +1,4 @@
+import struct, random, string
 from typing import Optional
 
 from fastapi import FastAPI
@@ -14,7 +15,8 @@ class Item(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    r = random.randint(0, 10)
+    return {"Hello": "World" + r}
 
 
 @app.get("/items/{item_id}")
