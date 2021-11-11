@@ -6,17 +6,16 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-
 class Item(BaseModel):
     name: str
     price: float
     is_offer: Optional[bool] = None
 
 
-@app.get("/")
+@app.get("/", status_code=200)
 def read_root():
     r = random.randint(0, 10)
-    return {"Hello": "World" + r}
+    return {"Hello": "World" + str(r)}
 
 
 @app.get("/items/{item_id}")

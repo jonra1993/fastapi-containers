@@ -16,18 +16,18 @@ providers:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
 
-metrics:
-  datadog:
-    addEntryPointsLabels: true
-    address: datadog-agent:8125
+# metrics:
+#   datadog:
+#     addEntryPointsLabels: true
+#     address: datadog-agent:8125
 
-tracing:
-  datadog:
-    localAgentHostPort: datadog-agent:8126
+# tracing:
+#   datadog:
+#     localAgentHostPort: datadog-agent:8126
 
 log:
-  filePath: "/traefik/logs/traefik.log"
-  format: json
+  filePath: "/logs/traefik.log"
+  level: INFO
 
 accessLog:
-  filePath: "/traefik/logs/access.log"
+  filePath: "/logs/access.log"  
