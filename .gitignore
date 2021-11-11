@@ -128,6 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+/database-data
 /traefik/.htpasswd
 /.env.local
 /.env.development.local
